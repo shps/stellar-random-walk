@@ -7,9 +7,9 @@ import org.scalatest.BeforeAndAfter
 
 class UniformRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter {
 
-  private val karate = "./randomwalk/src/test/resources/karate.txt"
-  private val karateNodeTypes = "./randomwalk/src/test/resources/karate-node-types.txt"
-  private val testGraph = "./randomwalk/src/test/resources/testgraph.txt"
+  private val karate = "./src/test/resources/karate.txt"
+  private val karateNodeTypes = "./src/test/resources/karate-node-types.txt"
+  private val testGraph = "./src/test/resources/testgraph.txt"
   private val master = "local[*]" // Note that you need to verify unit tests in a multi-core
   // computer.
   private val appName = "rw-unit-test"

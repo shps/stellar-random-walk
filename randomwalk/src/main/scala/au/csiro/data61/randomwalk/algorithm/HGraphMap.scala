@@ -14,6 +14,7 @@ object HGraphMap {
       vertices.clear()
       hGraph = new Array[GraphMap](numVertexTypes).map(_ => GraphMap())
       initialized = true
+      firstGet = false
     }
   }
 

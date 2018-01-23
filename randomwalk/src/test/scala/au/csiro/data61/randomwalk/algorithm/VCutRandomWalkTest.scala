@@ -6,8 +6,8 @@ import org.scalatest.BeforeAndAfter
 
 class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with Serializable {
 
-  private val karate = "./randomwalk/src/test/resources/karate.txt"
-  private val testGraph = "./randomwalk/src/test/resources/testgraph.txt"
+  private val karate = "./src/test/resources/karate.txt"
+  private val testGraph = "./src/test/resources/testgraph.txt"
   private val master = "local[*]" // Note that you need to verify unit tests in a multi-core
   // computer.
   private val appName = "rw-unit-test"
@@ -17,7 +17,7 @@ class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with
     // hostname"
     // If this test is running in MacOS and without Internet connection.
     // https://issues.apache.org/jira/browse/SPARK-19394
-    HGraphMap.initGraphMap(1)
+    HGraphMap.initGraphMap(3)
     val conf = new SparkConf().setMaster(master).setAppName(appName)
     sc = SparkContext.getOrCreate(conf)
   }
@@ -26,6 +26,7 @@ class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with
     if (sc != null) {
       sc.stop()
     }
+    HGraphMap.reset
   }
 
   test("load graph as undirected") {
@@ -88,11 +89,11 @@ class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with
   }
 
   test("buildRoutingTable") {
-    val vType: Short = 0
+    val t: Short = 0
     val pId = 0
-    val v1 = (pId, (1, Array.empty[(Int, Int, Float)], vType))
-    val v2 = (pId, (2, Array.empty[(Int, Int, Float)], vType))
-    val v3 = (pId, (3, Array.empty[(Int, Int, Float)], vType))
+    val v1 = (pId, (1, Array((Array.empty[(Int, Int, Float)], t)), t))
+    val v2 = (pId, (2, Array((Array.empty[(Int, Int, Float)], t)), t))
+    val v3 = (pId, (3, Array((Array.empty[(Int, Int, Float)], t)), t))
     val numPartitions = 3
     val partitioner = new HashPartitioner(numPartitions)
 
@@ -113,11 +114,11 @@ class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with
 
 
   test("transferWalkersToTheirPartitions") {
-    val vType: Short = 0
+    val t: Short = 0
     val pId = 0
-    val v1 = (pId, (1, Array.empty[(Int, Int, Float)], vType))
-    val v2 = (pId, (2, Array.empty[(Int, Int, Float)], vType))
-    val v3 = (pId, (3, Array.empty[(Int, Int, Float)], vType))
+    val v1 = (pId, (1, Array((Array.empty[(Int, Int, Float)], t)), t))
+    val v2 = (pId, (2, Array((Array.empty[(Int, Int, Float)], t)), t))
+    val v3 = (pId, (3, Array((Array.empty[(Int, Int, Float)], t)), t))
     val numPartitions = 8
 
     val config = Params(rddPartitions = numPartitions)
@@ -126,9 +127,9 @@ class VCutRandomWalkTest extends org.scalatest.FunSuite with BeforeAndAfter with
     val graph = sc.parallelize(Array(v1, v2, v3)).partitionBy(partitioner)
     val rTable = rw.buildRoutingTable(graph)
 
-    val w1 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, vType))
-    val w2 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, vType))
-    val w3 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, vType))
+    val w1 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, t))
+    val w2 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, t))
+    val w3 = (pId, (Array.empty[Int], Array.empty[(Int, Float)], false, t))
 
     val walkers = sc.parallelize(Array(w3, w1, w2)).partitionBy(partitioner)
     val tWalkers = rw.transferWalkersToTheirPartitions(rTable, walkers)
